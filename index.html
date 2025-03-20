@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тесты на продуктивность и развитие</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f4; color: #333; display: flex; }
+        .sidebar { width: 250px; background: #007BFF; color: white; padding: 20px; height: 100vh; position: fixed; }
+        .sidebar h2 { margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { margin: 10px 0; }
+        .sidebar a { color: white; text-decoration: none; font-weight: bold; }
+        .sidebar a:hover { text-decoration: underline; }
+        .content { margin-left: 270px; padding: 20px; width: 100%; }
+        .container { max-width: 800px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .back-button { display: inline-block; margin-bottom: 20px; padding: 10px; background: #007BFF; color: white; text-decoration: none; border-radius: 5px; }
+        .back-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Тесты</h2>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="productivity_test.html">Тест на продуктивность</a></li>
+            <li><a href="chronotype_test.html">Тест на хронотип </a></li>
+            <li><a href="procrastination_test.html">Тест на уровень прокрастинации </a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <div class="container">
+            <a href="index.html" class="back-button">← Назад</a>
+            <h1>Добро пожаловать на сайт тестов!</h1>
+            <p>Выберите тест, который хотите пройти:</p>
+            <ul>
+                <li><a href="productivity_test.html">Тест на уровень продуктивности</a></li>
+                <li><a href="#">Тест на стрессоустойчивость (скоро)</a></li>
+                <li><a href="#">Тест на концентрацию (скоро)</a></li>
+                <li><a href="#">Тест на управление временем (скоро)</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
