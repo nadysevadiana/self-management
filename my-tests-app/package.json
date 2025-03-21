@@ -1,6 +1,5 @@
 {
   "name": "my-tests-app",
-  "homepage": "https://nadysevadiana.github.io/self-management",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

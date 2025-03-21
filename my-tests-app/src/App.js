@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import Home from "./pages/Home";
@@ -27,25 +26,7 @@ const App = () => {
       <div className={`app ${theme}`}>
         <Sidebar />
         <motion.header
-          className="header"
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="header-inner">
-            <h1 className="logo">SelfMastery</h1>
-            <button className="theme-toggle" onClick={toggleTheme}>
-              {theme === "light" ? "🌙" : "☀️"}
-            </button>
-          </div>
-        </motion.header>
 
-        <motion.div
-          className="content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tests" element={<Tests />} />
@@ -62,5 +43,3 @@ const App = () => {
     </Router>
   );
 };
-
-export default App;
