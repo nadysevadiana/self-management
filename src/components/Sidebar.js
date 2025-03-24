@@ -2,9 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
 
-const Sidebar = () => {
+const Sidebar = ({ setSidebarOpen }) => {
   return (
-    <div className="sidebar-hover-area">
+    <div
+      className="sidebar-hover-area"
+      onMouseEnter={() => setSidebarOpen(true)}
+      onMouseLeave={() => setSidebarOpen(false)}
+    >
       <nav className="sidebar hover-reveal">
         <ul>
           <li><Link to="/">🏠 Главная</Link></li>
@@ -16,7 +20,6 @@ const Sidebar = () => {
               <li><Link to="/procrastination">⏳ Прокрастинация</Link></li>
             </ul>
           </li>
-          <li><Link to="/guides">📖 Гайды</Link></li>
           <li><Link to="/journal">📝 Дневник</Link></li>
           <li><Link to="/coaching">🎯 Коучинг</Link></li>
           <li><Link to="/about">🔍 О проекте</Link></li>

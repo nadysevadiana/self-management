@@ -3,7 +3,7 @@ import "../App.css";
 
 const Journal = () => {
   return (
-    <div className="container">
+    <div className="page-container center-viewport">
       <h1>📝 Личный дневник</h1>
       <p>Записывай свои идеи, мысли, цели и прогресс.</p>
     </div>

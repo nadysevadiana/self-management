@@ -5,7 +5,8 @@ import "../App.css";
 
 const Home = () => {
   return (
-    <motion.div className="home-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <div className="page-container center-viewport">
+    <motion.div className="container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <h1 className="home-title">Добро пожаловать в <span>SelfMastery Hub</span></h1>
       <p className="home-subtitle">Твой путь к продуктивности, самодисциплине и успеху!</p>
       
@@ -35,6 +36,7 @@ const Home = () => {
         </motion.div>
       </div>
     </motion.div>
+    </div>
   );
 };
 

@@ -5,7 +5,7 @@ import "../App.css";
 
 const Tests = () => {
   return (
-    <motion.div className="container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <motion.div className="page-container center-viewport" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <h1 className="page-title">📊 Тесты на продуктивность</h1>
       <p className="page-subtitle">Пройди тесты, чтобы узнать свои сильные и слабые стороны!</p>
       

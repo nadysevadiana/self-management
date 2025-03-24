@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import "../App.css";
+import "./Test.css";
 
 const ProductivityTest = () => {
   const sections = {
@@ -36,14 +37,21 @@ const ProductivityTest = () => {
   };
 
   const totalQuestions = Object.values(sections).flat().length;
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState(null);
+
+  const [answers, setAnswers] = useState(() => {
+    const saved = localStorage.getItem("productivityAnswers");
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const [result, setResult] = useState(() => localStorage.getItem("productivityResult") || null);
   const [showError, setShowError] = useState(false);
 
-  const handleAnswerChange = (index, value) => {
-    setAnswers(prev => ({ ...prev, [index]: value }));
+  const handleAnswerChange = (questionIndex, value) => {
+    const updatedAnswers = { ...answers, [questionIndex]: value };
+    setAnswers(updatedAnswers);
     setResult(null);
     setShowError(false);
+    localStorage.setItem("productivityAnswers", JSON.stringify(updatedAnswers));
   };
 
   const calculateScore = () => {
@@ -54,50 +62,81 @@ const ProductivityTest = () => {
 
     const score = Object.values(answers).reduce((acc, val) => acc + parseInt(val), 0);
     let resultText =
-      score >= 80 ? "🚀 Вы отлично управляете своим временем и продуктивностью!" :
-      score >= 60 ? "✅ Хороший уровень, но есть области, требующие внимания." :
-      score >= 40 ? "⚠️ Ваш уровень продуктивности оставляет желать лучшего." :
-      "⏳ Ваша продуктивность на низком уровне. Начните с малого.";
+      score >= 80
+        ? "🚀 Вы отлично управляете своим временем и продуктивностью!"
+        : score >= 60
+        ? "✅ Хороший уровень, но есть области, требующие внимания."
+        : score >= 40
+        ? "⚠️ Ваш уровень продуктивности оставляет желать лучшего."
+        : "⏳ Ваша продуктивность на низком уровне. Начните с малого.";
 
-    setResult(`Ваш результат: ${score} баллов. ${resultText}`);
+    const finalResult = `Ваш результат: ${score} баллов. ${resultText}`;
+    setResult(finalResult);
+    localStorage.setItem("productivityResult", finalResult);
+  };
+
+  const copyResultToClipboard = () => {
+    if (result) {
+      navigator.clipboard.writeText(result);
+      alert("Результат скопирован в буфер обмена!");
+    }
   };
 
   return (
     <motion.div className="test-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      {/* Заголовок */}
       <div className="test-header-card">
         <Link to="/tests" className="back-button">← Назад</Link>
         <h2 className="test-title">📊 Тест: Оценка уровня продуктивности</h2>
-        <p className="test-subtitle">Выберите наиболее подходящие для вас варианты ответов.</p>
+        <p className="test-subtitle">Ответьте на утверждения, выбирая степень согласия от 1 до 5.</p>
       </div>
 
+      {/* Прогресс */}
       <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${(Object.keys(answers).length / totalQuestions) * 100}%` }}></div>
+        <div
+          className="progress-fill"
+          style={{ width: `${(Object.keys(answers).length / totalQuestions) * 100}%` }}
+        ></div>
       </div>
 
       {showError && <p className="error-message">⚠️ Пожалуйста, ответьте на все вопросы.</p>}
 
+      {/* Вопросы */}
       <div className="test-grid-layout">
-        {Object.entries(sections).map(([section, questions], sectionIndex) => (
+        {Object.entries(sections).map(([sectionTitle, questions], sectionIndex) => (
           <div key={sectionIndex} className="test-section">
-            <h3 className="section-heading">{section}</h3>
+            <h3 className="section-heading">{sectionTitle}</h3>
+
             {questions.map((question, questionIndex) => {
-              const globalIndex = Object.values(sections).slice(0, sectionIndex).flat().length + questionIndex;
+              const globalIndex =
+                Object.values(sections)
+                  .slice(0, sectionIndex)
+                  .flat().length + questionIndex;
+
               return (
                 <div key={globalIndex} className="question-box">
                   <p className="question-text">{globalIndex + 1}. {question}</p>
-                  <div className="scale-options-column">
-                    {[1, 2, 3, 4, 5].map(value => (
-                      <div key={value} className="option-row">
-                        <label className={`scale-label ${answers[globalIndex] === value ? 'selected' : ''}`}>
-                          <input
-                            type="radio"
-                            name={`q${globalIndex}`}
-                            value={value}
-                            onChange={() => handleAnswerChange(globalIndex, value)}
-                          />
-                          <span>{value}</span>
-                        </label>
-                      </div>
+
+                  <div className="scale-options">
+                    {[
+                      { value: 1, label: "Совсем не согласен" },
+                      { value: 2, label: "Скорее не согласен" },
+                      { value: 3, label: "Нейтрально" },
+                      { value: 4, label: "Скорее согласен" },
+                      { value: 5, label: "Полностью согласен" }
+                    ].map(({ value, label }) => (
+                      <label
+                        key={value}
+                        className={`scale-label full ${answers[globalIndex]=== value ? "selected" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name={`q${globalIndex}`}
+                          value={value}
+                          onChange={() => handleAnswerChange(globalIndex, value)}
+                        />
+                        <span className="label">{label}</span>
+                      </label>
                     ))}
                   </div>
                 </div>
@@ -107,15 +146,30 @@ const ProductivityTest = () => {
         ))}
       </div>
 
+      {/* Кнопка результата */}
       <div className="submit-container">
-        <motion.button type="button" className="primary-button" onClick={calculateScore} whileHover={{ scale: 1.05 }}>
+        <motion.button
+          type="button"
+          className="primary-button"
+          onClick={calculateScore}
+          whileHover={{ scale: 1.05 }}
+        >
           📊 Получить результат
         </motion.button>
       </div>
 
+      {/* Результат */}
       {result && (
-        <motion.div className="result-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <motion.div
+          className="result-card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h3 className="result-text">{result}</h3>
+          <button onClick={copyResultToClipboard} className="copy-result-button">
+            📋 Скопировать результат
+          </button>
         </motion.div>
       )}
     </motion.div>

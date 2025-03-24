@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import "../App.css";
+import "./Test.css";
 
 const ProcrastinationTest = () => {
   const sections = {
@@ -29,10 +30,12 @@ const ProcrastinationTest = () => {
   };
 
   const totalQuestions = Object.values(sections).flat().length;
+
   const [answers, setAnswers] = useState(() => {
     const saved = localStorage.getItem("procrastinationAnswers");
     return saved ? JSON.parse(saved) : {};
   });
+
   const [result, setResult] = useState(() => localStorage.getItem("procrastinationResult") || null);
   const [showError, setShowError] = useState(false);
 
@@ -44,20 +47,28 @@ const ProcrastinationTest = () => {
     localStorage.setItem("procrastinationAnswers", JSON.stringify(updatedAnswers));
   };
 
-  const calculateProcrastinationScore = () => {
+  const calculateScore = () => {
+    return Object.values(answers).reduce((acc, val) => acc + parseInt(val), 0);
+  };
+
+  const getResultText = (score) => {
+    if (score >= 60)
+      return "🔥 Высокий уровень прокрастинации. Вам необходимо срочно внедрять методы борьбы с откладыванием дел.";
+    if (score >= 40)
+      return "⚡ Средний уровень прокрастинации. Вы часто откладываете дела, но можете справляться с этим.";
+    if (score >= 25)
+      return "✅ Низкий уровень прокрастинации. Иногда вы прокрастинируете, но в целом умеете управлять своим временем.";
+    return "🏆 Минимальная прокрастинация. Вы эффективно справляетесь с задачами.";
+  };
+
+  const handleSubmit = () => {
     if (Object.keys(answers).length < totalQuestions) {
       setShowError(true);
       return;
     }
 
-    let score = Object.values(answers).reduce((acc, val) => acc + parseInt(val), 0);
-    let resultText =
-      score >= 60 ? "🔥 Высокий уровень прокрастинации. Вам необходимо срочно внедрять методы борьбы с откладыванием дел." :
-      score >= 40 ? "⚡ Средний уровень прокрастинации. Вы часто откладываете дела, но можете справляться с этим." :
-      score >= 25 ? "✅ Низкий уровень прокрастинации. Иногда вы прокрастинируете, но в целом умеете управлять своим временем." :
-      "🏆 Минимальная прокрастинация. Вы эффективно справляетесь с задачами.";
-
-    const finalResult = `Ваш результат: ${score} баллов. ${resultText}`;
+    const score = calculateScore();
+    const finalResult = `Ваш результат: ${score} баллов. ${getResultText(score)}`;
     setResult(finalResult);
     localStorage.setItem("procrastinationResult", finalResult);
   };
@@ -71,37 +82,56 @@ const ProcrastinationTest = () => {
 
   return (
     <motion.div className="test-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      {/* Заголовок */}
       <div className="test-header-card">
         <Link to="/tests" className="back-button">← Назад</Link>
         <h2 className="test-title">🕒 Тест: Уровень прокрастинации</h2>
         <p className="test-subtitle">Ответьте на утверждения, выбирая степень согласия от 1 до 5.</p>
       </div>
 
+      {/* Прогресс */}
       <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${(Object.keys(answers).length / totalQuestions) * 100}%` }}></div>
+        <div
+          className="progress-fill"
+          style={{ width: `${(Object.keys(answers).length / totalQuestions) * 100}%` }}
+        ></div>
       </div>
 
       {showError && <p className="error-message">⚠️ Пожалуйста, ответьте на все вопросы.</p>}
 
+      {/* Вопросы */}
       <div className="test-grid-layout">
         {Object.entries(sections).map(([sectionTitle, questions], sectionIndex) => (
           <div key={sectionIndex} className="test-section">
             <h3 className="section-heading">{sectionTitle}</h3>
             {questions.map((question, questionIndex) => {
-              let globalIndex = sectionIndex * 5 + questionIndex;
+              const globalIndex =
+                Object.values(sections)
+                  .slice(0, sectionIndex)
+                  .flat().length + questionIndex;
+
               return (
                 <div key={globalIndex} className="question-box">
                   <p className="question-text">{globalIndex + 1}. {question}</p>
                   <div className="scale-options">
-                    {[1, 2, 3, 4, 5].map(value => (
-                      <label key={value} className={`scale-label ${answers[globalIndex] == value ? 'selected' : ''}`}>
+                    {[
+                      { value: 1, label: "Совсем не согласен" },
+                      { value: 2, label: "Скорее не согласен" },
+                      { value: 3, label: "Нейтрально" },
+                      { value: 4, label: "Скорее согласен" },
+                      { value: 5, label: "Полностью согласен" }
+                    ].map(({ value, label }) => (
+                      <label
+                        key={value}
+                        className={`scale-label full ${answers[globalIndex] === value ? "selected" : ""}`}
+                      >
                         <input
                           type="radio"
                           name={`q${globalIndex}`}
                           value={value}
                           onChange={() => handleAnswerChange(globalIndex, value)}
                         />
-                        <span>{value}</span>
+                        <span className="label">{label}</span>
                       </label>
                     ))}
                   </div>
@@ -112,16 +142,30 @@ const ProcrastinationTest = () => {
         ))}
       </div>
 
+      {/* Кнопка результата */}
       <div className="submit-container">
-        <motion.button type="button" className="primary-button" onClick={calculateProcrastinationScore} whileHover={{ scale: 1.05 }}>
+        <motion.button
+          type="button"
+          className="primary-button"
+          onClick={handleSubmit}
+          whileHover={{ scale: 1.05 }}
+        >
           📊 Получить результат
         </motion.button>
       </div>
 
+      {/* Результат */}
       {result && (
-        <motion.div className="result-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <motion.div
+          className="result-card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h3 className="result-text">{result}</h3>
-          <button onClick={copyResultToClipboard} className="copy-result-button">📋 Скопировать результат</button>
+          <button onClick={copyResultToClipboard} className="copy-result-button">
+            📋 Скопировать результат
+          </button>
         </motion.div>
       )}
     </motion.div>
